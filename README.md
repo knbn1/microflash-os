@@ -32,7 +32,7 @@ After it is "installed" just run the Batch file every "startup".
 
 ## Quick Start Guide
 
-In MicroflashOS, you can type ```help``` to get a list of all available commands.
+In MicroflashOS, you can type ```help``` to get a list of all available commands. 
 The more you do (usually just install packages) the more commands will be shown.
 
 Here are some useful commands to start with:
@@ -50,10 +50,8 @@ Here are some useful commands to start with:
 
 MicroflashOS includes a "package manager" (mfpkg)
 
-- To list available packages in repository type ```mfpkg-repo-available```
-  The included repository is the *GigaflashOS Unified Repository [Revision 1]*
-- To install/uninstall a package type ```mfpkg-install``` or ```mfpkg-uninstall``` respectively
-  Alternatively you can quickly install/uninstall a package with ```mfpkg-dl-[package ID]``` or ```mfpkg-rm-[package ID]``` respectively
+- To list available packages in repository type ```mfpkg-repo-available```. The included repository is the *GigaflashOS Unified Repository [Revision 1]*
+- To install/uninstall a package type ```mfpkg-install``` or ```mfpkg-uninstall``` respectively. Alternatively you can quickly install/uninstall a package with ```mfpkg-dl-[package ID]``` or ```mfpkg-rm-[package ID]``` respectively
 - To list installed packages type ```mfpkg-list```
 
 ---
@@ -70,8 +68,7 @@ Installing DevTools also opens up some more commands that can be viewed via ```h
 
 ## Jailbreak???
 
-As part of the lore, MicroflashOS has a jailbreak called Flashbreak, which has been faithfully recreated here.
-Some packages may require Flashbreak to function.
+As part of the lore, MicroflashOS has a jailbreak called Flashbreak, which has been faithfully recreated here. Some packages may require Flashbreak to function.
 
 Install package ID ```002```.
 
@@ -90,8 +87,7 @@ Simply delete the Batch file and the folder named ```MicroflashOS```
 ## File formats
 
 MicroflashOS utilises some file formats for system files:
-- ```.mcm```: MicroflashOS Core Module, reserved for critical system modules (sysmodules) that are required for MicroflashOS.
-  **It is recommended you do not modify these.**
+- ```.mcm```: MicroflashOS Core Module, reserved for critical system modules (sysmodules) that are required for MicroflashOS. **It is recommended you do not modify these.**
 - ```.mfm```: MicroflashOS Module, these are for non-critical sysmodules
 - ```.mfp```: MicroflashOS Package, used by packages installed from mfpkg
 
