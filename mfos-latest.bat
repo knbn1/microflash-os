@@ -6,18 +6,19 @@
 
 :: Setting some variables on startup
 
-set "sysdir=MicroflashOS"
-set "disk=%~p0%sysdir%"
+set "sysdisk=MicroflashOS"
+set "disk=%~p0%sysdisk%"
 set "fbver=4.4"
 set "usrdir=userdata"
 set "osdata=mfosdata"
+set "sysdir=mfos"
 set "pkgrepo=GigaflashOS Unified Repository [Revision 1]"
 set "mfver=2026.03.15"
 
 :: Rewrite version when DevTools are found
 
-if not exist "%disk%/system/extra-mods/devtools.mfm" (set "new_mfver=%mfver%")
-if exist "%disk%/system/extra-mods/devtools.mfm" (set "new_mfver=%mfver%-dev")
+if not exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (set "new_mfver=%mfver%")
+if exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (set "new_mfver=%mfver%-dev")
 
 :: Boot process starts
 
@@ -34,7 +35,7 @@ if exist "%disk%/%usrdir%/%username%/%osdata%/toggles/slowboot" (echo Slowboot t
 :: System disk check
 
 title Finding system disk...
-if exist "%sysdir%" (echo System disk '%sysdir%' mounted as /) else (
+if exist "%sysdisk%" (echo System disk '%sysdisk%' mounted as /) else (
 echo Unable to mount system disk!
 echo.
 title Startup Failure! && echo MicroflashOS startup failed. Entering recovery...
@@ -50,36 +51,36 @@ title Initializing devices...
 echo Initializing devices...
 echo.
 
-if not exist "%disk%/system/devices" (cd /d "%disk%/system/" && md devices)
-if not exist "%disk%/system/devices/mem" (cd /d "%disk%/system/devices" && md mem)
-if not exist "%disk%/system/devices/storage" (cd /d "%disk%/system/devices" && md storage)
+if not exist "%disk%/%sysdir%/devices" (cd /d "%disk%/%sysdir%/" && md devices)
+if not exist "%disk%/%sysdir%/devices/mem" (cd /d "%disk%/%sysdir%/devices" && md mem)
+if not exist "%disk%/%sysdir%/devices/storage" (cd /d "%disk%/%sysdir%/devices" && md storage)
 
-echo Memory sector 1 - Core system files>"%disk%/system/devices/mem/memsect1"
-if not exist "%disk%/system/devices/mem/memsect1" (echo Could not initialize device "memsect1" && echo. && pause && goto recovery)
+echo Memory sector 1 - Core system files>"%disk%/%sysdir%/devices/mem/memsect1"
+if not exist "%disk%/%sysdir%/devices/mem/memsect1" (echo Could not initialize device "memsect1" && echo. && pause && goto recovery)
 echo Initialized device "memsect1"
 
-echo Memory sector 2 - Userspace>"%disk%/system/devices/mem/memsect2"
-if not exist "%disk%/system/devices/mem/memsect2" (echo Could not initialize device "memsect2" && echo. && pause && goto recovery)
+echo Memory sector 2 - Userspace>"%disk%/%sysdir%/devices/mem/memsect2"
+if not exist "%disk%/%sysdir%/devices/mem/memsect2" (echo Could not initialize device "memsect2" && echo. && pause && goto recovery)
 echo Initialized device "memsect2"
 
-echo Memory sector 3 - Secret Block>"%disk%/system/devices/mem/memsect3"
-if not exist "%disk%/system/devices/mem/memsect3" (echo Could not initialize device "memsect3" && echo. && pause && goto recovery)
+echo Memory sector 3 - Secret Block>"%disk%/%sysdir%/devices/mem/memsect3"
+if not exist "%disk%/%sysdir%/devices/mem/memsect3" (echo Could not initialize device "memsect3" && echo. && pause && goto recovery)
 echo Initialized device "memsect3"
 
-echo Human Interface Devices>"%disk%/system/devices/hids"
-if not exist "%disk%/system/devices/hids" (echo Could not initialize device "hids" && echo. && pause && goto recovery)
+echo Human Interface Devices>"%disk%/%sysdir%/devices/hids"
+if not exist "%disk%/%sysdir%/devices/hids" (echo Could not initialize device "hids" && echo. && pause && goto recovery)
 echo Initialized device "hids"
 
-echo Auditory devices: headphones, speakers, microphones, etc. >"%disk%/system/devices/audio"
-if not exist "%disk%/system/devices/audio" (echo Could not initialize device "audio" && echo. && pause && goto recovery)
+echo Auditory devices: headphones, speakers, microphones, etc. >"%disk%/%sysdir%/devices/audio"
+if not exist "%disk%/%sysdir%/devices/audio" (echo Could not initialize device "audio" && echo. && pause && goto recovery)
 echo Initialized device "audio"
 
-echo System disk partition 1 - /system>"%disk%/system/devices/storage/disk0p1"
-if not exist "%disk%/system/devices/storage/disk0p1" (echo Could not initialize device "disk0p1" && echo. && pause && goto recovery)
+echo System disk partition 1 - /%sysdir%>"%disk%/%sysdir%/devices/storage/disk0p1"
+if not exist "%disk%/%sysdir%/devices/storage/disk0p1" (echo Could not initialize device "disk0p1" && echo. && pause && goto recovery)
 echo Initialized device "disk0p1"
 
-echo System disk partition 2 - /userdata>"%disk%/system/devices/storage/disk0p2"
-if not exist "%disk%/system/devices/storage/disk0p2" (echo Could not initialize device "disk0p2" && echo. && pause && goto recovery)
+echo System disk partition 2 - /userdata>"%disk%/%sysdir%/devices/storage/disk0p2"
+if not exist "%disk%/%sysdir%/devices/storage/disk0p2" (echo Could not initialize device "disk0p2" && echo. && pause && goto recovery)
 echo Initialized device "disk0p2"
 
 if exist "%disk%/%usrdir%/%username%/%osdata%/toggles/slowboot" (echo. && pause)
@@ -93,100 +94,100 @@ echo.
 
 :: Initialization of core sysmodules
 
-if exist "%disk%/system/ltmem.mcm" (echo Loaded /system/ltmem.mcm) else (
-echo Could not load /system/ltmem.mcm
+if exist "%disk%/%sysdir%/ltmem.mcm" (echo Loaded /%sysdir%/ltmem.mcm) else (
+echo Could not load /%sysdir%/ltmem.mcm
 echo.
 title Startup Failure! && echo MicroflashOS startup failed. Entering recovery...
 goto recovery )
 
-if exist "%disk%/system/stmem.mcm" (echo Loaded /system/stmem.mcm) else (
-echo Could not load /system/stmem.mcm
+if exist "%disk%/%sysdir%/stmem.mcm" (echo Loaded /%sysdir%/stmem.mcm) else (
+echo Could not load /%sysdir%/stmem.mcm
 echo.
 title Startup Failure! && echo MicroflashOS startup failed. Entering recovery...
 goto recovery )
 
-if exist "%disk%/system/core.mcm" (echo Loaded /system/core.mcm) else (
-echo Could not load /system/core.mcm
+if exist "%disk%/%sysdir%/core.mcm" (echo Loaded /%sysdir%/core.mcm) else (
+echo Could not load /%sysdir%/core.mcm
 echo.
 title Startup Failure! && echo MicroflashOS startup failed. Entering recovery...
 goto recovery )
 
-if exist "%disk%/system/fsutils.mcm" (echo Loaded /system/fsutils.mcm) else (
-echo Could not load /system/fsutils.mcm
+if exist "%disk%/%sysdir%/fsutils.mcm" (echo Loaded /%sysdir%/fsutils.mcm) else (
+echo Could not load /%sysdir%/fsutils.mcm
 echo.
 title Startup Failure! && echo MicroflashOS startup failed. Entering recovery...
 goto recovery )
 
-if exist "%disk%/system/recovery.mcm" (echo Loaded /system/recovery.mcm) else (
-echo Could not load /system/recovery.mcm
+if exist "%disk%/%sysdir%/recovery.mcm" (echo Loaded /%sysdir%/recovery.mcm) else (
+echo Could not load /%sysdir%/recovery.mcm
 echo.
 title Startup Failure! && echo MicroflashOS startup failed. Entering recovery...
 goto recovery )
 
-if exist "%disk%/system/cmd.mcm" (echo Loaded /system/cmd.mcm) else (
-echo Could not load /system/cmd.mcm
+if exist "%disk%/%sysdir%/cmd.mcm" (echo Loaded /%sysdir%/cmd.mcm) else (
+echo Could not load /%sysdir%/cmd.mcm
 echo.
 title Startup Failure! && echo MicroflashOS startup failed. Entering recovery...
 goto recovery )
 
-if exist "%disk%/system/kernel.mcm" (echo Loaded /system/kernel.mcm) else (
-echo Could not load /system/kernel.mcm
+if exist "%disk%/%sysdir%/kernel.mcm" (echo Loaded /%sysdir%/kernel.mcm) else (
+echo Could not load /%sysdir%/kernel.mcm
 echo.
 title Startup Failure! && echo MicroflashOS startup failed. Entering recovery...
 goto recovery )
 
-if exist "%disk%/system/compact.mcm" (echo Loaded /system/compact.mcm) else (
-echo Could not load /system/compact.mcm
+if exist "%disk%/%sysdir%/compact.mcm" (echo Loaded /%sysdir%/compact.mcm) else (
+echo Could not load /%sysdir%/compact.mcm
 echo.
 title Startup Failure! && echo MicroflashOS startup failed. Entering recovery...
 goto recovery )
 
-if exist "%disk%/system/proctector.mcm" (echo Loaded /system/proctector.mcm) else (
-echo Could not load /system/proctector.mcm
+if exist "%disk%/%sysdir%/proctector.mcm" (echo Loaded /%sysdir%/proctector.mcm) else (
+echo Could not load /%sysdir%/proctector.mcm
 echo.
 title Startup Failure! && echo MicroflashOS startup failed. Entering recovery...
 goto recovery )
 
-if exist "%disk%/system/mfpkg.mcm" (echo Loaded /system/mfpkg.mcm) else (
-echo Could not load /system/mfpkg.mcm
+if exist "%disk%/%sysdir%/mfpkg.mcm" (echo Loaded /%sysdir%/mfpkg.mcm) else (
+echo Could not load /%sysdir%/mfpkg.mcm
 echo.
 title Startup Failure! && echo MicroflashOS startup failed. Entering recovery...
 goto recovery )
 
 :: Initialization of non-critical sysmodules
 
-if exist "%disk%/system/extra-mods/sensors.mfm" (echo Loaded /system/extra-mods/sensors.mfm)
-if exist "%disk%/system/extra-mods/audio.mfm" (echo Loaded /system/extra-mods/audio.mfm)
-if exist "%disk%/system/extra-mods/graphics.mfm" (echo Loaded /system/extra-mods/graphics.mfm)
-if exist "%disk%/system/extra-mods/devtools.mfm" (echo Loaded /system/extra-mods/devtools.mfm)
+if exist "%disk%/%sysdir%/extra-mods/sensors.mfm" (echo Loaded /%sysdir%/extra-mods/sensors.mfm)
+if exist "%disk%/%sysdir%/extra-mods/audio.mfm" (echo Loaded /%sysdir%/extra-mods/audio.mfm)
+if exist "%disk%/%sysdir%/extra-mods/graphics.mfm" (echo Loaded /%sysdir%/extra-mods/graphics.mfm)
+if exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (echo Loaded /%sysdir%/extra-mods/devtools.mfm)
 
 if exist "%disk%/%usrdir%/%username%/%osdata%/toggles/slowboot" (echo. && pause)
 
 :: Jailbreak loading process
 
-if exist "%disk%/system/extra-mods/flashbreak.mfm" (
+if exist "%disk%/%sysdir%/extra-mods/flashbreak.mfm" (
   title Hello F145HBR34K!
   echo Loading F145HBR34K...
   echo.
-  if not exist "%disk%/system/extra-mods/devtools.mfm" (echo DevTools not found! && echo. && echo F145HBR34K could not be loaded.) else (
+  if not exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (echo DevTools not found! && echo. && echo F145HBR34K could not be loaded.) else (
   echo Decrypting sysmodules...
   echo.
 
-  if not exist "%disk%/system/cmd.mcm" (echo Sysmodule /system/cmd.mcm not found. Please reinstall MicroflashOS. && echo. && pause && goto recovery)
-  echo Patching /system/cmd.mcm
-  echo Command line [%new_mfver%] [FLASHBROKEN]>"%disk%/system/cmd.mcm"
+  if not exist "%disk%/%sysdir%/cmd.mcm" (echo Sysmodule /%sysdir%/cmd.mcm not found. Please reinstall MicroflashOS. && echo. && pause && goto recovery)
+  echo Patching /%sysdir%/cmd.mcm
+  echo Command line [%new_mfver%] [FLASHBROKEN]>"%disk%/%sysdir%/cmd.mcm"
 
-  if not exist "%disk%/system/fsutils.mcm" (echo Sysmodule /system/fsutils.mcm not found. Please reinstall MicroflashOS. && echo. && pause && goto recovery)
-  echo Patching /system/fsutils.mcm
-  echo File system read/write utilities [%new_mfver%] [FLASHBROKEN]>"%disk%/system/fsutils.mcm"
+  if not exist "%disk%/%sysdir%/fsutils.mcm" (echo Sysmodule /%sysdir%/fsutils.mcm not found. Please reinstall MicroflashOS. && echo. && pause && goto recovery)
+  echo Patching /%sysdir%/fsutils.mcm
+  echo File system read/write utilities [%new_mfver%] [FLASHBROKEN]>"%disk%/%sysdir%/fsutils.mcm"
 
-  if not exist "%disk%/system/proctector.mcm" (echo Sysmodule /system/proctector.mcm not found. Please reinstall MicroflashOS. && echo. && pause && goto recovery)
-  echo Patching /system/proctector.mcm
-  echo MicroflashOS Protector [%new_mfver%] [FLASHBROKEN]>"%disk%/system/proctector.mcm"
+  if not exist "%disk%/%sysdir%/proctector.mcm" (echo Sysmodule /%sysdir%/proctector.mcm not found. Please reinstall MicroflashOS. && echo. && pause && goto recovery)
+  echo Patching /%sysdir%/proctector.mcm
+  echo MicroflashOS Protector [%new_mfver%] [FLASHBROKEN]>"%disk%/%sysdir%/proctector.mcm"
 
-  if not exist "%disk%/system/extra-mods/devtools.mfm" (echo Sysmodule /system/extra-mods/devtools.mfm not found. Please reinstall MicroflashOS. && echo. && pause && goto recovery)
-  echo Patching /system/extra-mods/devtools.mfm
-  echo DevTools commands [%new_mfver%] [FLASHBROKEN]>"%disk%/system/extra-mods/devtools.mfm"
+  if not exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (echo Sysmodule /%sysdir%/extra-mods/devtools.mfm not found. Please reinstall MicroflashOS. && echo. && pause && goto recovery)
+  echo Patching /%sysdir%/extra-mods/devtools.mfm
+  echo DevTools commands [%new_mfver%] [FLASHBROKEN]>"%disk%/%sysdir%/extra-mods/devtools.mfm"
 
   echo.
   echo Sysmodule decryption complete.
@@ -202,7 +203,7 @@ if exist "%disk%/system/extra-mods/flashbreak.mfm" (
 
 title Checking userdata directory...
 echo.
-if exist "%disk%/%usrdir%/%username%" (echo Userdata directory is %sysdir%/%usrdir%. && echo.)
+if exist "%disk%/%usrdir%/%username%" (echo Userdata directory is %sysdisk%/%usrdir%. && echo.)
 
 :: Userdata regeneration
 
@@ -248,7 +249,7 @@ if not exist "%disk%/%usrdir%/%username%/%osdata%/toggles/nowelcome" (
 echo.
 echo Welcome to MicroflashOS!
 echo.
-if exist "%disk%/system/extra-mods/flashbreak.mfm" (echo F145HBR34K %fbver% && echo.)
+if exist "%disk%/%sysdir%/extra-mods/flashbreak.mfm" (echo F145HBR34K %fbver% && echo.)
 echo Logged in as %username%
 echo.
 echo Type HELP for a list of commands.
@@ -261,13 +262,13 @@ goto prompt
 :prompt
 
 echo.
-if not exist "%disk%/system/cmd.mcm" (echo Command line could not be loaded. Please reinstall MicroflashOS. && echo. && pause && exit)
+if not exist "%disk%/%sysdir%/cmd.mcm" (echo Command line could not be loaded. Please reinstall MicroflashOS. && echo. && pause && exit)
 
 :: Titlebar stuff
 
 set "titlebar=MicroflashOS %new_mfver%"
 title %titlebar%
-if exist "%disk%/system/extra-mods/flashbreak.mfm" (title %titlebar% [F145HBR34K %fbver%])
+if exist "%disk%/%sysdir%/extra-mods/flashbreak.mfm" (title %titlebar% [F145HBR34K %fbver%])
 
 if exist "%disk%/%usrdir%/%username%/%osdata%/toggles/showdir" (echo Current directory: %cd% && echo.)
 
@@ -295,7 +296,7 @@ goto %cmd%
 
 :help
 echo.
-if not exist "%disk%/system/core.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/core.mcm" (echo Invalid command. && goto prompt)
 echo Utilities:
 echo.
 echo about: Show some system info
@@ -308,7 +309,7 @@ echo reboot: Reboot system
 echo recovery: Reboot to recovery mode
 echo shutdown: Shutdown system
 echo.
-if exist "%disk%/system/fsutils.mcm" (
+if exist "%disk%/%sysdir%/fsutils.mcm" (
 echo File management:
 echo.
 echo mkdir: Create a directory
@@ -319,7 +320,7 @@ echo cd: Change to a directory
 echo home: Quickly change to user directory
 echo homewipe: Wipe user directory
 )
-if exist "%disk%/system/extra-mods/devtools.mfm" (
+if exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (
 echo.
 echo Developer commands:
 echo.
@@ -327,7 +328,7 @@ echo devtools-uninstall: DevTools uninstaller
 echo mountsys: Mount system disk to modify contents
 echo modules: List installed system modules "sysmodules"
 echo toggles-[create/delete/enabled/list]: Manage system "toggles"
-if exist  "%disk%/system/extra-mods/flashbreak.mfm" (
+if exist  "%disk%/%sysdir%/extra-mods/flashbreak.mfm" (
 echo.
 echo F145HBR34K commands:
 echo.
@@ -335,7 +336,7 @@ echo flashbreak-uninstall: Uninstall jailbreak
 echo flashbreak-reboot: Force reboot regardless of core.mcm presence
 )
 )
-if exist "%disk%/system/mfpkg.mcm" (
+if exist "%disk%/%sysdir%/mfpkg.mcm" (
 echo.
 echo Package management:
 echo.
@@ -362,76 +363,76 @@ echo.
 echo Reinstalling MicroflashOS.
 echo.
 pause
-if not exist "%~p0%sysdir%" (md "%sysdir%")
-if not exist "%~p0%sysdir%" (echo. && echo Failed to format system disk! && echo. && pause && goto recovery)
+if not exist "%~p0%sysdisk%" (md "%sysdisk%")
+if not exist "%~p0%sysdisk%" (echo. && echo Failed to format system disk! && echo. && pause && goto recovery)
 echo.
-echo System disk '%sysdir%' mounted as /
-cd /d "%~p0%sysdir%"
-if not exist system (md system)
-if not exist system (echo. && echo Failed to create operating system data directory! && echo. && pause && goto recovery)
+echo System disk '%sysdisk%' mounted as /
+cd /d "%~p0%sysdisk%"
+if not exist %sysdir% (md %sysdir%)
+if not exist %sysdir% (echo. && echo Failed to create operating system data directory! && echo. && pause && goto recovery)
 
 echo.
 echo Installing core sysmodules...
 echo.
 
-echo Long-term memory [%new_mfver%]>"%disk%/system/ltmem.mcm"
-if not exist "%disk%/system/ltmem.mcm" (echo Failed to install sysmodule "/system/ltmem.mcm". && echo. && pause && goto recovery)
-echo Installed /system/ltmem.mcm
+echo Long-term memory [%new_mfver%]>"%disk%/%sysdir%/ltmem.mcm"
+if not exist "%disk%/%sysdir%/ltmem.mcm" (echo Failed to install sysmodule "/%sysdir%/ltmem.mcm". && echo. && pause && goto recovery)
+echo Installed /%sysdir%/ltmem.mcm
 
-echo Short-term memory [%new_mfver%]>"%disk%/system/stmem.mcm"
-if not exist "%disk%/system/stmem.mcm" (echo Failed to install sysmodule "/system/stmem.mcm". && echo. && pause && goto recovery)
-echo Installed /system/stmem.mcm
+echo Short-term memory [%new_mfver%]>"%disk%/%sysdir%/stmem.mcm"
+if not exist "%disk%/%sysdir%/stmem.mcm" (echo Failed to install sysmodule "/%sysdir%/stmem.mcm". && echo. && pause && goto recovery)
+echo Installed /%sysdir%/stmem.mcm
 
-echo Core MicroflashOS commands [%new_mfver%]>"%disk%/system/core.mcm"
-if not exist "%disk%/system/core.mcm" (echo Failed to install sysmodule "/system/core.mcm". && echo. && pause && goto recovery)
-echo Installed /system/core.mcm
+echo Core MicroflashOS commands [%new_mfver%]>"%disk%/%sysdir%/core.mcm"
+if not exist "%disk%/%sysdir%/core.mcm" (echo Failed to install sysmodule "/%sysdir%/core.mcm". && echo. && pause && goto recovery)
+echo Installed /%sysdir%/core.mcm
 
-echo File system read/write utilities [%new_mfver%]>"%disk%/system/fsutils.mcm"
-if not exist "%disk%/system/fsutils.mcm" (echo Failed to install sysmodule "/system/fsutils.mcm". && echo. && pause && goto recovery)
-echo Installed /system/fsutils.mcm
+echo File system read/write utilities [%new_mfver%]>"%disk%/%sysdir%/fsutils.mcm"
+if not exist "%disk%/%sysdir%/fsutils.mcm" (echo Failed to install sysmodule "/%sysdir%/fsutils.mcm". && echo. && pause && goto recovery)
+echo Installed /%sysdir%/fsutils.mcm
 
-echo Command line [%new_mfver%]>"%disk%/system/cmd.mcm"
-if not exist "%disk%/system/cmd.mcm" (echo Failed to install sysmodule "/system/cmd.mcm". && echo. && pause && goto recovery)
-echo Installed /system/cmd.mcm
+echo Command line [%new_mfver%]>"%disk%/%sysdir%/cmd.mcm"
+if not exist "%disk%/%sysdir%/cmd.mcm" (echo Failed to install sysmodule "/%sysdir%/cmd.mcm". && echo. && pause && goto recovery)
+echo Installed /%sysdir%/cmd.mcm
 
-echo MicroflashOS recovery [%new_mfver%]>"%disk%/system/recovery.mcm"
-if not exist "%disk%/system/recovery.mcm" (echo Failed to install sysmodule "/system/recovery.mcm". && echo. && pause && goto recovery)
-echo Installed /system/recovery.mcm
+echo MicroflashOS recovery [%new_mfver%]>"%disk%/%sysdir%/recovery.mcm"
+if not exist "%disk%/%sysdir%/recovery.mcm" (echo Failed to install sysmodule "/%sysdir%/recovery.mcm". && echo. && pause && goto recovery)
+echo Installed /%sysdir%/recovery.mcm
 
-echo MicroflashOS kernel.mcm [%new_mfver%]>"%disk%/system/kernel.mcm"
-if not exist "%disk%/system/kernel.mcm" (echo Failed to install sysmodule "/system/kernel.mcm". && echo. && pause && goto recovery)
-echo Installed /system/kernel.mcm
+echo MicroflashOS kernel.mcm [%new_mfver%]>"%disk%/%sysdir%/kernel.mcm"
+if not exist "%disk%/%sysdir%/kernel.mcm" (echo Failed to install sysmodule "/%sysdir%/kernel.mcm". && echo. && pause && goto recovery)
+echo Installed /%sysdir%/kernel.mcm
 
-echo MicroflashOS Ultracompacter [%new_mfver%]>"%disk%/system/compact.mcm"
-if not exist "%disk%/system/compact.mcm" (echo Failed to install sysmodule "/system/compact.mcm". && echo. && pause && goto recovery)
-echo Installed /system/compact.mcm
+echo MicroflashOS Ultracompacter [%new_mfver%]>"%disk%/%sysdir%/compact.mcm"
+if not exist "%disk%/%sysdir%/compact.mcm" (echo Failed to install sysmodule "/%sysdir%/compact.mcm". && echo. && pause && goto recovery)
+echo Installed /%sysdir%/compact.mcm
 
-echo MicroflashOS Protector [%new_mfver%]>"%disk%/system/proctector.mcm"
-if not exist "%disk%/system/proctector.mcm" (echo Failed to install sysmodule "/system/proctector.mcm". && echo. && pause && goto recovery)
-echo Installed /system/proctector.mcm
+echo MicroflashOS Protector [%new_mfver%]>"%disk%/%sysdir%/proctector.mcm"
+if not exist "%disk%/%sysdir%/proctector.mcm" (echo Failed to install sysmodule "/%sysdir%/proctector.mcm". && echo. && pause && goto recovery)
+echo Installed /%sysdir%/proctector.mcm
 
-echo MicroflashOS Package Manager [%new_mfver%]>"%disk%/system/mfpkg.mcm"
-if not exist "%disk%/system/mfpkg.mcm" (echo Failed to install sysmodule "/system/mfpkg.mcm". && echo. && pause && goto recovery)
-echo Installed /system/mfpkg.mcm
+echo MicroflashOS Package Manager [%new_mfver%]>"%disk%/%sysdir%/mfpkg.mcm"
+if not exist "%disk%/%sysdir%/mfpkg.mcm" (echo Failed to install sysmodule "/%sysdir%/mfpkg.mcm". && echo. && pause && goto recovery)
+echo Installed /%sysdir%/mfpkg.mcm
 
 echo.
 echo Installing additional sysmodules...
 echo.
 
-if not exist "%disk%/system/extra-mods" (md "%disk%/system/extra-mods")
-cd /d "%disk%/system/extra-mods"
+if not exist "%disk%/%sysdir%/extra-mods" (md "%disk%/%sysdir%/extra-mods")
+cd /d "%disk%/%sysdir%/extra-mods"
 
-echo Audio output [%new_mfver%]>"%disk%/system/extra-mods/audio.mfm"
-if not exist "%disk%/system/extra-mods/audio.mfm" (echo Failed to install sysmodule "/system/extra-mods/audio.mfm". && echo. && pause && goto recovery)
-echo Installed /system/extra-mods/audio.mfm
+echo Audio output [%new_mfver%]>"%disk%/%sysdir%/extra-mods/audio.mfm"
+if not exist "%disk%/%sysdir%/extra-mods/audio.mfm" (echo Failed to install sysmodule "/%sysdir%/extra-mods/audio.mfm". && echo. && pause && goto recovery)
+echo Installed /%sysdir%/extra-mods/audio.mfm
 
-echo Graphics subsystem [%new_mfver%]>"%disk%/system/extra-mods/graphics.mfm"
-if not exist "%disk%/system/extra-mods/graphics.mfm" (echo Failed to install sysmodule "/system/extra-mods/graphics.mfm". && echo. && pause && goto recovery)
-echo Installed /system/extra-mods/graphics.mfm
+echo Graphics subsystem [%new_mfver%]>"%disk%/%sysdir%/extra-mods/graphics.mfm"
+if not exist "%disk%/%sysdir%/extra-mods/graphics.mfm" (echo Failed to install sysmodule "/%sysdir%/extra-mods/graphics.mfm". && echo. && pause && goto recovery)
+echo Installed /%sysdir%/extra-mods/graphics.mfm
 
-echo All-in-one sensor package [%new_mfver%]>"%disk%/system/extra-mods/sensors.mfm"
-if not exist "%disk%/system/extra-mods/sensors.mfm" (echo Failed to install sysmodule "/system/extra-mods/sensors.mfm". && echo. && pause && goto recovery)
-echo Installed /system/extra-mods/sensors.mfm
+echo All-in-one sensor package [%new_mfver%]>"%disk%/%sysdir%/extra-mods/sensors.mfm"
+if not exist "%disk%/%sysdir%/extra-mods/sensors.mfm" (echo Failed to install sysmodule "/%sysdir%/extra-mods/sensors.mfm". && echo. && pause && goto recovery)
+echo Installed /%sysdir%/extra-mods/sensors.mfm
 
 :: Post-installation activities
 
@@ -472,24 +473,24 @@ goto reboot
 
 :about
 echo.
-if not exist "%disk%/system/core.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/core.mcm" (echo Invalid command. && goto prompt)
 echo MicroflashOS version: %new_mfver%
-if exist "%disk%/system/extra-mods/flashbreak.mfm" (echo F145HBR34K version: %fbver%)
-echo Mounted system disk: %sysdir%
+if exist "%disk%/%sysdir%/extra-mods/flashbreak.mfm" (echo F145HBR34K version: %fbver%)
+echo Mounted system disk: %sysdisk%
 echo.
 echo Hostname: %userdomain%
 echo Processor: %processor_identifier% (%NUMBER_OF_PROCESSORS% cores)
 echo Architecture: %processor_architecture%
 echo.
 echo Made by Kenneth White.
-if exist "%disk%/system/extra-mods/flashbreak.mfm" (
+if exist "%disk%/%sysdir%/extra-mods/flashbreak.mfm" (
 echo Jailbreak by Team Centurion with help from Team Starburst
 echo Special thanks to nsp and the GigaflashOS devs! )
 goto prompt
 
 :time
 echo.
-if not exist "%disk%/system/core.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/core.mcm" (echo Invalid command. && goto prompt)
 echo Time: %time%
 echo Date: %date%
 goto prompt
@@ -497,7 +498,7 @@ goto prompt
 :: Clear the shell
 
 :clear
-if not exist "%disk%/system/core.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/core.mcm" (echo Invalid command. && goto prompt)
 if not exist "%disk%/%usrdir%/%username%/%osdata%/toggles/noclear" (cls)
 goto prompt
 
@@ -505,7 +506,7 @@ goto prompt
 
 :shutdown
 echo.
-if not exist "%disk%/system/core.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/core.mcm" (echo Invalid command. && goto prompt)
 title Shutting down...
 echo Shutting down...
 exit
@@ -515,7 +516,7 @@ exit
 :mkdir
 title File Manager
 echo.
-if not exist "%disk%/system/fsutils.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/fsutils.mcm" (echo Invalid command. && goto prompt)
 set /p "mkd=Directory to create: "
 if exist "%mkd%" (echo. && echo Directory already exists! && goto prompt)
 md "%mkd%"
@@ -527,7 +528,7 @@ goto prompt
 :mkfile
 title File Manager
 echo.
-if not exist "%disk%/system/fsutils.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/fsutils.mcm" (echo Invalid command. && goto prompt)
 set /p "mkf_name=New file name: "
 echo.
 set /p "mkf_contents=Contents: "
@@ -540,7 +541,7 @@ goto prompt
 
 :del
 title File Manager
-if not exist "%disk%/system/fsutils.mcm" (echo. && echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/fsutils.mcm" (echo. && echo Invalid command. && goto prompt)
 echo.
 set /p "del=File/directory to delete: "
 if not exist "%del%" (echo. && echo File/directory does not exist. && goto prompt)
@@ -555,7 +556,7 @@ goto prompt
 :list
 title File Manager
 echo.
-if not exist "%disk%/system/fsutils.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/fsutils.mcm" (echo Invalid command. && goto prompt)
 echo Directories:
 echo.
 dir /a:d /b
@@ -568,7 +569,7 @@ goto prompt
 :cd
 title File Manager
 echo.
-if not exist "%disk%/system/fsutils.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/fsutils.mcm" (echo Invalid command. && goto prompt)
 set /p "chdir=Name of directory to change to: "
 echo.
 if not exist "%chdir%" (echo Directory invalid! && goto prompt)
@@ -580,7 +581,7 @@ goto prompt
 
 :home
 title File Manager
-if not exist "%disk%/system/fsutils.mcm" (echo. && echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/fsutils.mcm" (echo. && echo Invalid command. && goto prompt)
 if not exist "%disk%/%usrdir%/%username%" (echo. && echo Userdata directory not found. && goto prompt)
 cd /d "%disk%/%usrdir%/%username%"
 echo.
@@ -590,7 +591,7 @@ goto prompt
 :homewipe
 title File Manager
 echo. 
-if not exist "%disk%/system/fsutils.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/fsutils.mcm" (echo Invalid command. && goto prompt)
 if not exist "%disk%/%usrdir%/%username%" (echo Userdata directory not found. && goto prompt)
 echo This command wipes userdata.
 echo Back up any data before continuing!
@@ -628,14 +629,14 @@ goto prompt
 :devtools-uninstall
 title MicroflashOS DevTools Uninstaller
 echo.
-if not exist "%disk%/system/extra-mods/devtools.mfm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (echo Invalid command. && goto prompt)
 echo Uninstalling DevTools...
 echo.
 pause
 echo.
 set "curdir=%cd%"
-cd /d "%disk%/system/extra-mods/" && del devtools.mfm /f
-if exist "%disk%/system/extra-mods/devtools.mfm" (echo Uninstall failed! && goto prompt)
+cd /d "%disk%/%sysdir%/extra-mods/" && del devtools.mfm /f
+if exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (echo Uninstall failed! && goto prompt)
 cd /d "%disk%/%usrdir%/%username%/%osdata%/packages/installed/" && del 001-DevTools /f
 if exist "%disk%/%usrdir%/%username%/%osdata%/packages/installed/001-DevTools" (echo Uninstall failed! && goto prompt)
 echo DevTools uninstalled.
@@ -646,31 +647,31 @@ goto prompt
 
 :mountsys
 echo.
-if not exist "%disk%/system/extra-mods/devtools.mfm" (echo DevTools not found. Please install pID 001. && goto prompt)
-if not exist "%disk%/system/" (echo System disk not found! Please reinstall MicroflashOS. && goto prompt)
+if not exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (echo DevTools not found. Please install pID 001. && goto prompt)
+if not exist "%disk%/%sysdir%/" (echo System disk not found! Please reinstall MicroflashOS. && goto prompt)
 title MicroflashOS System Mounter
 echo Mounting...
 echo.
-cd /d "%disk%/system/"
+cd /d "%disk%/%sysdir%/"
 echo Your current directory has been changed to the system disk root.
 echo Please be aware that modifying the system disk directly may lead to a brick!
 goto prompt
 
 :modules
-if not exist "%disk%/system/extra-mods/devtools.mfm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (echo Invalid command. && goto prompt)
 echo.
 echo Critical sysmodules:
 echo.
-dir /a:-d /b "%disk%/system/"
+dir /a:-d /b "%disk%/%sysdir%/"
 echo.
 echo Additional sysmodules:
 echo.
-dir /a:-d /b "%disk%/system/extra-mods/"
+dir /a:-d /b "%disk%/%sysdir%/extra-mods/"
 goto prompt
 
 :toggles-create
 echo.
-if not exist "%disk%/system/extra-mods/devtools.mfm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (echo Invalid command. && goto prompt)
 set /p "cfgadd=Name of toggle: "
 echo %cfgadd%>"%disk%/%usrdir%/%username%/%osdata%/toggles/%cfgadd%"
 if not exist "%disk%/%usrdir%/%username%/%osdata%/toggles/%cfgadd%" (echo. && echo Failed to write toggle. && echo. && goto prompt)
@@ -680,7 +681,7 @@ goto prompt
 
 :toggles-delete
 echo.
-if not exist "%disk%/system/extra-mods/devtools.mfm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (echo Invalid command. && goto prompt)
 set /p "cfgdel=Toggle to delete: "
 del "%disk%/%usrdir%/%username%/%osdata%/toggles/%cfgdel%" /f /q
 if exist "%disk%/%usrdir%/%username%/%osdata%/toggles/%cfgdel%" (echo. && echo Failed to delete toggle. && echo. && goto prompt)
@@ -690,7 +691,7 @@ goto prompt
 
 :toggles-enabled
 echo.
-if not exist "%disk%/system/extra-mods/devtools.mfm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (echo Invalid command. && goto prompt)
 echo Enabled toggles:
 echo.
 dir /a:-d /b "%disk%/%usrdir%/%username%/%osdata%/toggles/"
@@ -698,7 +699,7 @@ goto prompt
 
 :toggles-list
 echo.
-if not exist "%disk%/system/extra-mods/devtools.mfm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (echo Invalid command. && goto prompt)
 echo Available toggles in MicroflashOS as of version %new_mfver%:
 echo.
 echo Tweaks:
@@ -717,8 +718,8 @@ goto prompt
 
 :flashbreak-uninstall
 echo.
-if not exist "%disk%/system/extra-mods/flashbreak.mfm" (echo Invalid command. && goto prompt)
-if not exist "%disk%/system/extra-mods/devtools.mfm" (echo DevTools not found. Please install pID 001. && goto prompt)
+if not exist "%disk%/%sysdir%/extra-mods/flashbreak.mfm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (echo DevTools not found. Please install pID 001. && goto prompt)
 echo F145HBR34K Uninstaller
 echo.
 echo F145HBR34K version: %fbver%
@@ -727,8 +728,8 @@ echo.
 echo Uninstalling jailbreak...
 echo.
 pause
-cd /d "%disk%/system/extra-mods" && del flashbreak.mfm /f /q
-if exist "%disk%/system/extra-mods/flashbreak.mfm" (echo Uninstall failed! && goto prompt)
+cd /d "%disk%/%sysdir%/extra-mods" && del flashbreak.mfm /f /q
+if exist "%disk%/%sysdir%/extra-mods/flashbreak.mfm" (echo Uninstall failed! && goto prompt)
 cd /d "%disk%/%usrdir%/%username%/%osdata%/packages/installed" && del 002-F145HBR34K /f /q
 if exist "%disk%/%usrdir%/%username%/%osdata%/packages/installed/002-F145HBR34K" (echo Uninstall failed! && goto prompt)
 echo.
@@ -742,7 +743,7 @@ goto reboot
 
 :flashbreak-reboot
 echo.
-if not exist "%disk%/system/extra-mods/flashbreak.mfm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/extra-mods/flashbreak.mfm" (echo Invalid command. && goto prompt)
 echo Forcing a reboot...
 echo.
 goto reboot
@@ -752,7 +753,7 @@ goto reboot
 :mfpkg-install
 title MicroflashOS Package Manager
 echo.
-if not exist "%disk%/system/mfpkg.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/mfpkg.mcm" (echo Invalid command. && goto prompt)
 set /p "pkginst_id=Package ID to install: "
 set "pkginst=mfpkg-dl-%pkginst_id%
 title Finding package...
@@ -770,7 +771,7 @@ goto %pkginst%
 :mfpkg-uninstall
 title MicroflashOS Package Manager
 echo.
-if not exist "%disk%/system/mfpkg.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/mfpkg.mcm" (echo Invalid command. && goto prompt)
 set /p "pkgrm_id=Package ID to uninstall: "
 set "pkgrm=mfpkg-rm-%pkgrm_id%"
 title Finding package...
@@ -789,7 +790,7 @@ goto %pkgrm%
 :mfpkg-list
 title MicroflashOS Package Manager
 echo.
-if not exist "%disk%/system/mfpkg.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/mfpkg.mcm" (echo Invalid command. && goto prompt)
 echo Installed packages:
 echo.
 dir /a:-d /b "%disk%/%usrdir%/%username%/%osdata%/packages/installed/"
@@ -813,19 +814,19 @@ goto prompt
 
 :mfpkg-dl-001
 echo.
-if not exist "%disk%/system/mfpkg.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/mfpkg.mcm" (echo Invalid command. && goto prompt)
 title MicroflashOS Package Manager
 echo Downloading DevTools (pID 001)
 echo.
 echo Executing installer...
 echo.
 title MicroflashOS DevTools Installer
-if exist "%disk%/system/extra-mods/devtools.mfm" (echo DevTools are already installed! && goto prompt)
+if exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (echo DevTools are already installed! && goto prompt)
 echo Installing DevTools...
 echo.
-echo DevTools commands [%new_mfver%]>"%disk%/system/extra-mods/devtools.mfm"
+echo DevTools commands [%new_mfver%]>"%disk%/%sysdir%/extra-mods/devtools.mfm"
 set "new_mfver=%mfver%-dev"
-if exist "%disk%/system/extra-mods/devtools.mfm" (
+if exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (
 echo Installed successfully!
 echo Developer commands have been added to the help section.
 echo Installed package from %pkgrepo%> "%disk%/%usrdir%/%username%/%osdata%/packages/installed/001-DevTools"
@@ -837,34 +838,34 @@ goto prompt
 
 :mfpkg-dl-002
 echo.
-if not exist "%disk%/system/mfpkg.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/mfpkg.mcm" (echo Invalid command. && goto prompt)
 title MicroflashOS Package Manager
 echo Downloading F145HBR34K (pID 002)
 echo.
 echo Executing installer...
 echo.
 title F145HBR34K Installer
-if not exist "%disk%/system/extra-mods/devtools.mfm" (echo DevTools not found. Please install pID 001. && goto prompt)
+if not exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (echo DevTools not found. Please install pID 001. && goto prompt)
 echo F145HBR34K version: %fbver%
 echo MicroflashOS version: %new_mfver%
 echo.
-if exist "%disk%/system/extra-mods/flashbreak.mfm" (echo Error: F145HBR34K already installed! && goto prompt)
+if exist "%disk%/%sysdir%/extra-mods/flashbreak.mfm" (echo Error: F145HBR34K already installed! && goto prompt)
 
-if not exist "%disk%/system/cmd.mcm" (echo Sysmodule /system/cmd.mcm not found. Please reinstall MicroflashOS. && echo. && goto prompt)
-echo Validated /system/cmd.mcm
+if not exist "%disk%/%sysdir%/cmd.mcm" (echo Sysmodule /%sysdir%/cmd.mcm not found. Please reinstall MicroflashOS. && echo. && goto prompt)
+echo Validated /%sysdir%/cmd.mcm
 
-if not exist "%disk%/system/fsutils.mcm" (echo Sysmodule /system/fsutils.mcm not found. Please reinstall MicroflashOS. && echo. && goto prompt)
-echo Validated /system/fsutils.mcm
+if not exist "%disk%/%sysdir%/fsutils.mcm" (echo Sysmodule /%sysdir%/fsutils.mcm not found. Please reinstall MicroflashOS. && echo. && goto prompt)
+echo Validated /%sysdir%/fsutils.mcm
 
-if not exist "%disk%/system/extra-mods/devtools.mfm" (echo Sysmodule /system/extra-mods/devtools.mfm not found. Please reinstall MicroflashOS. && echo. && goto prompt)
-echo Validated /system/extra-mods/devtools.mfm
+if not exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (echo Sysmodule /%sysdir%/extra-mods/devtools.mfm not found. Please reinstall MicroflashOS. && echo. && goto prompt)
+echo Validated /%sysdir%/extra-mods/devtools.mfm
 
 echo.
-echo Installing system module /system/extra-mods/flashbreak.mfm...
+echo Installing system module /%sysdir%/extra-mods/flashbreak.mfm...
 echo.
-echo F145HBR34K jailbreak utility [%new_mfver%]>"%disk%/system/extra-mods/flashbreak.mfm"
+echo F145HBR34K jailbreak utility [%new_mfver%]>"%disk%/%sysdir%/extra-mods/flashbreak.mfm"
 
-if exist "%disk%/system/extra-mods/flashbreak.mfm" (
+if exist "%disk%/%sysdir%/extra-mods/flashbreak.mfm" (
 echo Installed package from %pkgrepo%> "%disk%/%usrdir%/%username%/%osdata%/packages/installed/002-F145HBR34K"
 echo Installed successfully!
 echo.
@@ -882,7 +883,7 @@ goto prompt
 
 :mfpkg-dl-003
 echo.
-if not exist "%disk%/system/mfpkg.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/mfpkg.mcm" (echo Invalid command. && goto prompt)
 title MicroflashOS Package Manager
 echo Downloading WinFlash Compatibility Layer (pID 003)
 echo.
@@ -897,7 +898,7 @@ goto prompt
 
 :mfpkg-dl-004
 echo.
-if not exist "%disk%/system/mfpkg.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/mfpkg.mcm" (echo Invalid command. && goto prompt)
 title MicroflashOS Package Manager
 echo Downloading Nuke (pID 004)
 echo.
@@ -912,7 +913,7 @@ goto prompt
 
 :mfpkg-dl-005
 echo.
-if not exist "%disk%/system/mfpkg.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/mfpkg.mcm" (echo Invalid command. && goto prompt)
 title MicroflashOS Package Manager
 echo Downloading dumper (pID 005)
 echo.
@@ -927,7 +928,7 @@ goto prompt
 
 :mfpkg-dl-006
 echo.
-if not exist "%disk%/system/mfpkg.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/mfpkg.mcm" (echo Invalid command. && goto prompt)
 title MicroflashOS Package Manager
 echo Downloading mountvirt (pID 006)
 echo.
@@ -944,7 +945,7 @@ goto prompt
 
 :mfpkg-rm-003
 echo.
-if not exist "%disk%/system/mfpkg.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/mfpkg.mcm" (echo Invalid command. && goto prompt)
 title MicroflashOS Package Manager
 echo Uninstalling WinFlash Compatibility Layer (pID 003)
 echo.
@@ -961,7 +962,7 @@ goto prompt
 
 :mfpkg-rm-004
 echo.
-if not exist "%disk%/system/mfpkg.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/mfpkg.mcm" (echo Invalid command. && goto prompt)
 title MicroflashOS Package Manager
 echo Uninstalling Nuke (pID 004)
 echo.
@@ -978,7 +979,7 @@ goto prompt
 
 :mfpkg-rm-005
 echo.
-if not exist "%disk%/system/mfpkg.mcm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/mfpkg.mcm" (echo Invalid command. && goto prompt)
 title MicroflashOS Package Manager
 echo Uninstalling dumper (pID 006)
 echo.
@@ -995,7 +996,7 @@ goto prompt
 
 :mfpkg-rm-006
 echo.
-if not exist "%disk%/system/mfpkg.mcm" (echo Invalid command. && goto prompt)s
+if not exist "%disk%/%sysdir%/mfpkg.mcm" (echo Invalid command. && goto prompt)s
 title MicroflashOS Package Manager
 echo Uninstalling mountvirt (pID 006)
 echo.
@@ -1015,14 +1016,14 @@ goto prompt
 :nuke
 echo.
 if not exist "%disk%/%usrdir%/%username%/%osdata%/packages/nuke.mfp" (echo Invalid command. && goto prompt)
-if not exist "%disk%/system/extra-mods/devtools.mfm" (echo DevTools not found. Please install pID 001. && goto prompt)
+if not exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (echo DevTools not found. Please install pID 001. && goto prompt)
 title Nuke
 echo Nuking system disk. ALL DATA WILL BE WIPED!
 echo.
 pause
 echo.
-if exist "%disk%/system" (
-rd "%disk%/system" /s /q
+if exist "%disk%/%sysdir%" (
+rd "%disk%/%sysdir%" /s /q
 echo System disk nuked.
 goto prompt
 )
@@ -1032,12 +1033,12 @@ goto prompt
 :dumper
 echo.
 if not exist "%disk%/%usrdir%/%username%/%osdata%/packages/dumper.mfp" (echo Invalid command. && goto prompt)
-if not exist "%disk%/system/extra-mods/devtools.mfm" (echo DevTools not found. Please install pID 001. && goto prompt)
-if not exist "%disk%/system/extra-mods/flashbreak.mfm" (echo This package requires F145HBR34K to function. Please install pID 002. && goto prompt)
+if not exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (echo DevTools not found. Please install pID 001. && goto prompt)
+if not exist "%disk%/%sysdir%/extra-mods/flashbreak.mfm" (echo This package requires F145HBR34K to function. Please install pID 002. && goto prompt)
 title MicroflashOS Dumper
 echo MicroflashOS Dumper by nsp
 echo.
-if exist "%disk%/system" (
+if exist "%disk%/%sysdir%" (
   echo System disk mounted!
   echo.
   echo Dumping current MicroflashOS system disk to %~p0dump
@@ -1063,8 +1064,8 @@ goto prompt
 :mountvirt
 echo.
 if not exist "%disk%/%usrdir%/%username%/%osdata%/packages/mountvirt.mfp" (echo Invalid command. && goto prompt)
-if not exist "%disk%/system/extra-mods/flashbreak.mfm" (echo Invalid command. && goto prompt)
-if not exist "%disk%/system/extra-mods/devtools.mfm" (echo DevTools not found. Please install pID 001. && goto prompt)
+if not exist "%disk%/%sysdir%/extra-mods/flashbreak.mfm" (echo Invalid command. && goto prompt)
+if not exist "%disk%/%sysdir%/extra-mods/devtools.mfm" (echo DevTools not found. Please install pID 001. && goto prompt)
 title Virtual System Disk Mounter
 echo Virtual system disks should be placed in the same directory as the Batch file.
 echo Current directory: %~p0
@@ -1074,7 +1075,7 @@ echo.
 set /p "sysvirt=Name of system disk: "
 echo.
 if not exist "%~p0%sysvirt%" (echo System disk not found! && goto prompt)
-set "sysdir=%sysvirt%"
+set "sysdisk=%sysvirt%"
 echo Mounted virtual disk! Rebooting...
 echo.
 pause
